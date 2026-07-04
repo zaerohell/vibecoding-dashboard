@@ -1,5 +1,6 @@
 import { PROJECTS, STATUS_CONFIG, PRIORITY_ICON } from "@/lib/projects";
 import { fetchAllProjects, type CUTask } from "@/lib/clickup";
+import { RefreshBar } from "./RefreshBar";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
@@ -78,9 +79,10 @@ export default async function HomePage() {
             <StatPill label="en progreso" count={totalInProgress} cls="bg-amber-900/50 text-amber-300 border border-amber-700/50" />
             <StatPill label="bloqueadas"  count={totalBlocked}    cls="bg-rose-900/50 text-rose-300 border border-rose-700/50"   />
             <a href="https://app.clickup.com" target="_blank"
-              className="text-xs text-slate-500 hover:text-slate-300 transition-colors ml-2">
+              className="text-xs text-slate-500 hover:text-slate-300 transition-colors ml-2 hidden sm:block">
               ClickUp →
             </a>
+            <RefreshBar />
           </div>
         </div>
       </header>
