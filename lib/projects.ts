@@ -50,9 +50,10 @@ export type Project = typeof PROJECTS[number];
 
 export function normalizeStatus(raw: string): "open" | "in_progress" | "done" | "blocked" {
   const s = raw.toLowerCase().trim();
-  if (["done","closed","complete","completed"].includes(s)) return "done";
-  if (["in progress","in_progress","working","active"].includes(s)) return "in_progress";
-  if (["blocked","on hold","waiting"].includes(s)) return "blocked";
+  // Status de ClickUp en español
+  if (["completadas","completado","done","closed","complete","completed","cerrada","cerrado"].includes(s)) return "done";
+  if (["en progreso","in progress","in_progress","working","active","en curso"].includes(s)) return "in_progress";
+  if (["bloqueada","bloqueado","blocked","on hold","waiting"].includes(s)) return "blocked";
   return "open";
 }
 
