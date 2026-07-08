@@ -2,23 +2,27 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 
-const INTERVAL = 60; // segundos
+const INTERVAL = 60;
 
 export function RefreshBar() {
   const router = useRouter();
-  const [seconds, setSeconds]       = useState(INTERVAL);
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [seconds, setSeconds]        = useState(INTERVAL);
+  const [lastUpdate, setLastUpdate]  = useState<string | null>(null); // null en SSR
   const [isPending, startTransition] = useTransition();
+
+  // Solo en cliente — evita hydration mismatch
+  useEffect(() => {
+    setLastUpdate(new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+  }, []);
 
   function refresh() {
     startTransition(() => {
       router.refresh();
-      setLastUpdate(new Date());
+      setLastUpdate(new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
       setSeconds(INTERVAL);
     });
   }
 
-  // Cuenta regresiva — al llegar a 0 dispara refresh automático
   useEffect(() => {
     const tick = setInterval(() => {
       setSeconds(s => {
@@ -34,12 +38,12 @@ export function RefreshBar() {
 
   return (
     <div className="flex items-center gap-3">
-      {/* Última actualización */}
-      <span className="text-xs text-slate-500 hidden sm:block">
-        Actualizado {lastUpdate.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-      </span>
+      {lastUpdate && (
+        <span className="text-xs text-slate-500 hidden sm:block">
+          Actualizado {lastUpdate}
+        </span>
+      )}
 
-      {/* Círculo de cuenta regresiva */}
       <div className="relative w-7 h-7 flex-shrink-0">
         <svg className="w-7 h-7 -rotate-90" viewBox="0 0 28 28">
           <circle cx="14" cy="14" r="11" fill="none" stroke="#1e293b" strokeWidth="2.5" />
@@ -54,7 +58,6 @@ export function RefreshBar() {
         </span>
       </div>
 
-      {/* Botón refresh manual */}
       <button onClick={refresh} disabled={isPending} title="Actualizar ahora"
         className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors disabled:opacity-50">
         <svg className={`w-3.5 h-3.5 ${isPending ? "animate-spin" : ""}`}

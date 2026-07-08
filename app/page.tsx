@@ -51,11 +51,8 @@ function StatPill({ label, count, cls }: { label: string; count: number; cls: st
 
 export default async function HomePage() {
   const allData = await fetchAllProjects(PROJECTS.map(p => p.listId));
-
-  // Merge por proyecto
   const projects = PROJECTS.map((p, i) => ({ ...p, ...allData[i] }));
 
-  // Totales globales
   const totalTasks      = projects.reduce((s, p) => s + p.tasks.length, 0);
   const totalInProgress = projects.reduce((s, p) => s + p.tasks.filter(t => t.status === "in_progress").length, 0);
   const totalBlocked    = projects.reduce((s, p) => s + p.tasks.filter(t => t.status === "blocked").length, 0);
@@ -88,7 +85,6 @@ export default async function HomePage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {/* Sin API key */}
         {!hasApiKey && (
           <div className="mb-6 rounded-xl border border-amber-700/50 bg-amber-900/20 px-5 py-4">
             <p className="text-sm font-semibold text-amber-300">⚠ CLICKUP_API_KEY no configurada</p>
@@ -101,13 +97,12 @@ export default async function HomePage() {
         {/* KPIs globales */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {[
-            { label: "Total tareas",   count: totalTasks,       cls: "text-slate-200" },
-            { label: "En progreso",    count: totalInProgress,  cls: "text-amber-400" },
-            { label: "Pendientes",     count: totalOpen,        cls: "text-blue-400"  },
-            { label: "Completadas",    count: totalDone,        cls: "text-emerald-400" },
+            { label: "Total tareas",   count: totalTasks,      cls: "text-slate-200"   },
+            { label: "En progreso",    count: totalInProgress, cls: "text-amber-400"   },
+            { label: "Pendientes",     count: totalOpen,       cls: "text-blue-400"    },
+            { label: "Completadas",    count: totalDone,       cls: "text-emerald-400" },
           ].map(k => (
-            <div key={k.label}
-              className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-center">
+            <div key={k.label} className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-center">
               <p className={`text-3xl font-black ${k.cls}`}>{k.count}</p>
               <p className="text-xs text-slate-500 mt-1">{k.label}</p>
             </div>
@@ -125,8 +120,7 @@ export default async function HomePage() {
             const donePct    = p.tasks.length > 0 ? Math.round(done.length / p.tasks.length * 100) : 0;
 
             return (
-              <div key={p.id}
-                className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden">
+              <div key={p.id} className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden">
                 {/* Header del proyecto */}
                 <div className="px-5 py-4 border-b border-slate-800"
                   style={{ borderLeftColor: p.color, borderLeftWidth: 4 }}>
@@ -138,9 +132,20 @@ export default async function HomePage() {
                         <p className="text-xs text-slate-500 mt-0.5">{p.description}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
                       <a href={p.url} target="_blank"
                         className="text-xs text-slate-500 hover:text-slate-300 transition-colors">↗ App</a>
+                      {/* Versión y build */}
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded"
+                          style={{ background: p.color + "22", color: p.color }}>
+                          {p.version}
+                        </span>
+                        <span className="text-[9px] text-slate-600 font-mono">
+                          #{p.commit}
+                        </span>
+                      </div>
+                      <span className="text-[9px] text-slate-600">build {p.build}</span>
                     </div>
                   </div>
 
@@ -153,7 +158,7 @@ export default async function HomePage() {
                     ))}
                   </div>
 
-                  {/* Stats + barra */}
+                  {/* Progreso */}
                   <div className="flex items-center gap-3 mt-3">
                     <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
                       <div className="h-full rounded-full transition-all"
@@ -179,16 +184,12 @@ export default async function HomePage() {
                     </div>
                   )}
                   {active.length === 0 && done.length === 0 && (
-                    <div className="text-center py-6">
-                      <p className="text-xs text-slate-500">{p.error ? `Error: ${p.error}` : "Sin tareas"}</p>
-                    </div>
+                    <p className="text-xs text-slate-500 text-center py-6">
+                      {p.error ? `Error: ${p.error}` : "Sin tareas"}
+                    </p>
                   )}
-
-                  {/* Bloqueadas primero */}
                   {blocked.map(t => <TaskRow key={t.id} task={t} />)}
-                  {/* En progreso */}
                   {inProgress.map(t => <TaskRow key={t.id} task={t} />)}
-                  {/* Pendientes (máx 5) */}
                   {open.slice(0, 5).map(t => <TaskRow key={t.id} task={t} />)}
                   {open.length > 5 && (
                     <p className="text-[10px] text-slate-600 text-center pt-1">
@@ -202,7 +203,7 @@ export default async function HomePage() {
         </div>
 
         <p className="text-center text-xs text-slate-700 mt-8">
-          Actualizado cada 60s · ClickUp API v2 · {new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" })}
+          Actualizado cada 60s · ClickUp API v2 · Cycle 4 (Jul 7–20)
         </p>
       </main>
     </div>
