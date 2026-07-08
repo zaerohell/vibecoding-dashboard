@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 
   try {
     // Buscar si ya existe en Linear
-    const existing = await findLinearIssue(taskName, taskId);
+    const existing = await findLinearIssue(taskName);
 
     if (existing) {
       // Actualizar estado en Linear
@@ -106,7 +106,6 @@ export async function POST(req: NextRequest) {
         priority: Number(priority),
         listId,
         clickupUrl: taskUrl,
-        clickupTaskId: taskId,
       });
       console.log(`[sync] Created Linear ${created?.identifier} from ClickUp task`);
       return NextResponse.json({
