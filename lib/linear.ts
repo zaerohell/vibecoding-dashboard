@@ -1,8 +1,8 @@
 // lib/linear.ts
 // Cliente Linear API para sincronización desde ClickUp
 
-const LINEAR_API   = "https://api.linear.app/graphql";
-const LINEAR_TOKEN = process.env.LINEAR_API_KEY!;
+const LINEAR_API     = "https://api.linear.app/graphql";
+const LINEAR_TOKEN   = process.env.LINEAR_API_KEY!;
 const LINEAR_TEAM_ID = process.env.LINEAR_TEAM_ID ?? "b1a97a6d-c20c-4606-b045-cef904de8db6";
 
 // ── Estado IDs del team "Proyectos CRM" (hardcoded para evitar query extra) ──
@@ -31,8 +31,6 @@ export const STATUS_MAP: Record<string, string> = {
 };
 
 // ── Mapa prioridad ClickUp → Linear ──
-// ClickUp: 1=urgent, 2=high, 3=normal, 4=low
-// Linear:  0=no priority, 1=urgent, 2=high, 3=medium, 4=low
 export const PRIORITY_MAP: Record<number, number> = {
   1: 1, 2: 2, 3: 3, 4: 4,
 };
@@ -45,7 +43,7 @@ export const LIST_TO_PROJECT: Record<string, { project: string; label: string }>
   "901416845658": { project: "Ismerely-KB",     label: "bienestar"  },
 };
 
-// ── Label IDs del team (hardcoded para evitar query extra) ──
+// ── Label IDs del team ──
 const LABEL_IDS: Record<string, string> = {
   "playamx":    "9f72fb1c-2cd6-4264-861a-e4d35e100e31",
   "lavanderia": "67624efe-fbde-43d7-a621-84405eb4d29b",
@@ -69,23 +67,31 @@ async function linearQuery(query: string, variables: Record<string, unknown> = {
   return json.data;
 }
 
-// ── Busca un issue en Linear por título ──
+// ── Busca un issue en Linear por título usando filter (no issueSearch deprecated) ──
 export async function findLinearIssue(taskName: string) {
   const data = await linearQuery(`
-    query SearchIssue($query: String!) {
-      issueSearch(query: $query, first: 3, filter: {
-        team: { id: { eq: "${LINEAR_TEAM_ID}" } }
-      }) {
+    query FindIssue($teamId: ID!, $title: String!) {
+      issues(
+        first: 5
+        filter: {
+          team: { id: { eq: $teamId } }
+          title: { containsIgnoreCase: $title }
+        }
+      ) {
         nodes { id identifier title state { name } priority }
       }
     }
-  `, { query: taskName });
+  `, {
+    teamId: LINEAR_TEAM_ID,
+    title: taskName,
+  });
 
-  // Buscar coincidencia exacta de título
-  const exact = data.issueSearch.nodes.find(
-    (n: { title: string }) => n.title.toLowerCase() === taskName.toLowerCase()
+  const nodes = data.issues.nodes as Array<{ title: string; id: string; identifier: string }>;
+  // Preferir coincidencia exacta
+  const exact = nodes.find(
+    (n) => n.title.toLowerCase() === taskName.toLowerCase()
   );
-  return exact ?? data.issueSearch.nodes[0] ?? null;
+  return exact ?? nodes[0] ?? null;
 }
 
 // ── Actualiza el estado de un issue en Linear ──
