@@ -41,6 +41,7 @@ export const LIST_TO_PROJECT: Record<string, { project: string; label: string }>
   "901416845673": { project: "Lavanderia CRM",  label: "lavanderia" },
   "901416845649": { project: "Rectificadora",   label: "riviera"    },
   "901416845658": { project: "Ismerely-KB",     label: "bienestar"  },
+  "901417923251": { project: "GreenView",       label: "greenview"  },
 };
 
 // ── Label IDs del team ──

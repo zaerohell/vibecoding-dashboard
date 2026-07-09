@@ -133,6 +133,7 @@ export default async function HomePage() {
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      {p.status === "wip" && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">WIP</span>}
                       <a href={p.url} target="_blank"
                         className="text-xs text-slate-500 hover:text-slate-300 transition-colors">↗ App</a>
                       {/* Versión y build */}

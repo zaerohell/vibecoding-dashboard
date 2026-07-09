@@ -60,6 +60,21 @@ export const PROJECTS = [
     commit:      "a176de4",
     status:      "production" as const,
   },
+  {
+    id:          "greenview",
+    name:        "GreenView",
+    description: "Infrastructure Visibility Dashboard",
+    listId:      "901417923251",
+    color:       "#22c55e",
+    icon:        "📊",
+    url:         "https://greenview.vercel.app",
+    repo:        "zaerohell/greenview",
+    stack:       ["Next.js 16", "React 19", "Google Sheets", "Tailwind"],
+    version:     "v0.1.0",
+    build:       "20260709",
+    commit:      "8547f50",
+    status:      "wip" as const,
+  },
 ] as const;
 
 export type Project = typeof PROJECTS[number];
