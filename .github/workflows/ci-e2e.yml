@@ -1,0 +1,91 @@
+name: 🚀 CI + E2E — VibeCoding Dashboard
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+  schedule:
+    # 06:45 UTC diario — después de CraveView (06:40)
+    - cron: "45 6 * * *"
+
+jobs:
+  build-and-lint:
+    name: 🔍 Build + Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  e2e:
+    name: 🔬 E2E contra producción (Vercel)
+    runs-on: ubuntu-latest
+    needs: build-and-lint
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - name: Verificar que producción está viva
+        run: |
+          for i in 1 2 3; do
+            if curl -sf "https://vibecoding-dashboard-amber.vercel.app/" > /dev/null; then
+              echo "✅ Producción responde"
+              exit 0
+            fi
+            echo "⏳ Intento $i/3 — reintentando en 10s"
+            sleep 10
+          done
+          echo "❌ Producción no responde tras 3 intentos"
+          exit 1
+
+      - name: Run E2E tests contra producción
+        env:
+          E2E_BASE_URL: https://vibecoding-dashboard-amber.vercel.app
+        run: npm run test:e2e
+
+  notify-failure:
+    name: 📧 Alerta fallo E2E schedule
+    runs-on: ubuntu-latest
+    needs: e2e
+    if: >
+      failure() &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    steps:
+      - name: Enviar alerta por email
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: "❌ VibeCoding Dashboard E2E falló — ${{ github.run_id }}"
+          to: zaero.hell@gmail.com
+          from: VibeCoding Dashboard CI <${{ secrets.SMTP_USER }}>
+          body: |
+            ❌ Los tests E2E contra producción (Vercel) fallaron.
+
+            Fecha:  ${{ github.run_started_at }}
+            Commit: ${{ github.sha }}
+            Run:    https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            — VibeCoding Dashboard CI
