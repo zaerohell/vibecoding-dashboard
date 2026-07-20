@@ -105,6 +105,21 @@ export const PROJECTS = [
     commit:      "5d0a53c",
     status:      "wip" as const,
   },
+  {
+    id:          "pcview",
+    name:        "PCView",
+    description: "Computer & Mobile Inventory Dashboard",
+    listId:      "901418287519",
+    color:       "#a855f7",
+    icon:        "🖥️",
+    url:         "https://pcview.vercel.app",
+    repo:        "zaerohell/pcview",
+    stack:       ["Next.js 15", "Prisma 7", "Neon", "Google Sheets"],
+    version:     "v0.1.0",
+    build:       "20260717",
+    commit:      "1fa2bfa",
+    status:      "wip" as const,
+  },
 ] as const;
 
 export type Project = typeof PROJECTS[number];
