@@ -3,7 +3,7 @@ import { fetchAllProjects } from "@/lib/clickup";
 import DashboardClient from "./DashboardClient";
 
 export const dynamic   = "force-dynamic";
-export const revalidate = 60;
+export const revalidate = 18000; // 5h — consistente con RefreshBar.tsx (INTERVAL)
 
 export default async function HomePage() {
   const allData  = await fetchAllProjects(PROJECTS.map(p => p.listId));
