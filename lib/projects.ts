@@ -10,9 +10,9 @@ export const PROJECTS = [
     url:         "https://playamxcrm.vercel.app",
     repo:        "zaerohell/VS",
     stack:       ["Next.js 16", "NestJS", "Neon", "Groq AI"],
-    version:     "v1.6.1",
-    build:       "20260629b",
-    commit:      "8cff190",
+    version:     "v2.0.0",
+    build:       "20260905",
+    commit:      "2b05daa",
     status:      "production" as const,
   },
   {
