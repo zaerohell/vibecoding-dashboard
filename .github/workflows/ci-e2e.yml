@@ -5,8 +5,16 @@ on:
     branches: [main]
   workflow_dispatch: {}
   schedule:
-    # 06:45 UTC diario — después de CraveView (06:40)
-    - cron: "45 6 * * *"
+    # 06:45 UTC lunes y jueves (antes diario) — reduce consumo de minutos
+    # de Actions; el objetivo (detectar drift externo) no requiere diario
+    - cron: "45 6 * * 1,4"
+
+# Cancela corridas anteriores del mismo branch si llega un push nuevo
+# antes de que termine -- evita gastar minutos de Actions en commits
+# ya obsoletos.
+concurrency:
+  group: ci-e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-lint:
