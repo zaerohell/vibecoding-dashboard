@@ -488,12 +488,9 @@ export default function DashboardClient({ projects }: { projects: Project[] }) {
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-[#30d158] animate-pulse" />
             <span className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.25)" }}>
-              Live · ClickUp API v2 · Auto-refresh 60s
+              Live · ClickUp API v2 · Auto-refresh 5h
             </span>
           </div>
-          <span className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.15)" }}>
-            Cycle 4 · Jul 7–20
-          </span>
         </div>
       </main>
     </div>
